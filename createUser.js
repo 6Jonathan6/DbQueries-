@@ -5,7 +5,7 @@ const event = {
     nombre:'juan',
     apellido:'perez',
     sexo:'m',
-    edad:'mm',
+    edad:5,
     telefono:'5530202464',
     prospera:'TRUE',
     email:'ejemplo@ejemplo.com'
@@ -38,7 +38,7 @@ let handler= async (event) =>{
     const client = await pool.connect()
     try {
         const res = await client.query(query,parameters).catch(e=>{throw(e)})
-        console.log(res.rows)
+        console.log(res.rows[0].id)
     }catch(err){
         console.log(err)
     }  finally{
