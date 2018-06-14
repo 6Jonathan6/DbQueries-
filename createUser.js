@@ -5,7 +5,7 @@ const event = {
     nombre:'juan',
     apellido:'perez',
     sexo:'m',
-    edad:5,
+    edad:55,
     telefono:'5530202464',
     prospera:'TRUE',
     email:'ejemplo@ejemplo.com'
@@ -36,15 +36,27 @@ let handler= async (event) =>{
     }
     
     const client = await pool.connect()
+    const dbResponse ={}
     try {
         const res = await client.query(query,parameters).catch(e=>{throw(e)})
-        console.log(res.rows[0].id)
+        console.log(res.rows[0])
+        dbResponse.id = res.rows[0].id
+
     }catch(err){
         console.log(err)
+        dbResponse.error = err
+
     }  finally{
         client.release()
+        console.log('final')
+        return dbResponse
     }
 
 }
+/*
+    Las async functions siempre retornan un promesa
+    aunque en el caso de lambda functions regresan un json
+    cuando las invocas cons el sdk de AWS 
+ */
 
-    handler(event)
+handler(event).then(dbResponse=> console.log(dbResponse))
