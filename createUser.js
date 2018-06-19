@@ -2,7 +2,7 @@ const {Pool} = require('pg')
 const dbData = require('./data.js')
 
 const event = {
-    nombre:'Maria',
+    nombre:'maria',
     apellido:'perez',
     sexo:'f',
     edad:26,
@@ -13,14 +13,14 @@ const event = {
 }
 
 const event2 = {
-    idPaciente: 66687,
+    idPaciente: 66717,
     fechaUMen: '2018-06-18',
     method:  'regEmbarazada'
 }
 
 const event3 = {
     // [pacientId,fecha,hora]
-    idPaciente:66687,
+    idPaciente:66717,
     fecha:'2018-06-22',
     hora:'12:30',
     method: 'regCita'
@@ -77,22 +77,25 @@ let handler= async (event) =>{
     try {
         switch(event.method){
             case 'regPaciente':
-                    parameters=[
-                    
-                    event.nombre,
-                    event.apellido,
-                    event.sexo,
-                    event.edad,
-                    event.telefono,
-                    event.prospera,
-                    event.email,
-                ]
-                response = await registrarpaciente(client,parameters).catch(e=>{throw(e)})
-                dbResponse.id = response.rows[0].id
-                break
+            parameters=[
+                
+                event.nombre,
+                event.apellido,
+                event.sexo,
+                event.edad,
+                event.telefono,
+                event.prospera,
+                event.email,
+            ]
+            response = await registrarpaciente(client,parameters).catch(e=>{throw(e)})
+            dbResponse.id = response.rows[0].id
+            break
             
             case 'regEmbarazada':
-                parameters = [
+                if(event.sexo != 'f'){
+                    throw(new Error('Men cannot get pregnant!'))
+                }
+            parameters = [
                     event.fechaUMen,
                     event.idPaciente
                 ]
@@ -108,11 +111,13 @@ let handler= async (event) =>{
                 response = await registrarCita(client,parameters).catch(e=>{throw(e)})
                 dbResponse.cita = response.rows[0]
                 break
+            case 'getUsersByEmail':
+                break
                 
         }
     }catch(err){
         console.log(err)
-        dbResponse.error = err.code
+        dbResponse.error = err.code ? err.code : err  
         console.log(dbResponse.error)
 
     }  finally{
